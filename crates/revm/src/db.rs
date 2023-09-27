@@ -1,4 +1,6 @@
 pub mod emptydb;
+#[cfg(feature = "ceramic")]
+pub mod ceramic;
 #[cfg(feature = "ethersdb")]
 pub mod ethersdb;
 pub mod in_memory_db;
