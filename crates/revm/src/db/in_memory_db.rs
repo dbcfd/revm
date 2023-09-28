@@ -5,6 +5,7 @@ use crate::primitives::{
 use crate::Database;
 use alloc::vec::Vec;
 use core::convert::Infallible;
+use bytes::Bytes;
 
 /// A [Database] implementation that stores all state changes in memory.
 pub type InMemoryDB = CacheDB<EmptyDB>;
@@ -240,6 +241,20 @@ impl<ExtDB: DatabaseRef> Database for CacheDB<ExtDB> {
             }
         }
     }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
 }
 
 impl<ExtDB: DatabaseRef> DatabaseRef for CacheDB<ExtDB> {
@@ -283,6 +298,20 @@ impl<ExtDB: DatabaseRef> DatabaseRef for CacheDB<ExtDB> {
             Some(entry) => Ok(*entry),
             None => self.db.block_hash(number),
         }
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
     }
 }
 
@@ -399,6 +428,20 @@ impl Database for BenchmarkDB {
     // History related
     fn block_hash(&mut self, _number: U256) -> Result<B256, Self::Error> {
         Ok(B256::default())
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
     }
 }
 

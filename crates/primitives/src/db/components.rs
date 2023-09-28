@@ -2,6 +2,7 @@
 pub mod block_hash;
 pub mod state;
 
+use bytes::Bytes;
 pub use block_hash::{BlockHash, BlockHashRef};
 pub use state::{State, StateRef};
 
@@ -46,6 +47,20 @@ impl<S: State, BH: BlockHash> Database for DatabaseComponents<S, BH> {
             .block_hash(number)
             .map_err(Self::Error::BlockHash)
     }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self,  _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self,  _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
 }
 
 impl<S: StateRef, BH: BlockHashRef> DatabaseRef for DatabaseComponents<S, BH> {
@@ -71,5 +86,19 @@ impl<S: StateRef, BH: BlockHashRef> DatabaseRef for DatabaseComponents<S, BH> {
         self.block_hash
             .block_hash(number)
             .map_err(Self::Error::BlockHash)
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self,  _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self,  _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self,  _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
     }
 }

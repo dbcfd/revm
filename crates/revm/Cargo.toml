@@ -10,6 +10,8 @@ version = "3.3.0"
 readme = "../../README.md"
 
 [dependencies]
+anyhow = "1.0.75"
+bytes = "1.5.0"
 revm-interpreter = { path = "../interpreter", version = "1.1.2", default-features = false }
 revm-precompile = { path = "../precompile", version = "2.0.2", default-features = false }
 
@@ -21,7 +23,7 @@ serde = { version = "1.0", features = ["derive", "rc"], optional = true }
 serde_json = { version = "1.0", features = ["preserve_order"], optional = true }
 
 # ceramic
-ceramic-http-client = { git = "https://github.com/3box/ceramic-http-client-rs.git", branch = "main", optional = true }
+ceramic-http-client = { git = "https://github.com/3box/ceramic-http-client-rs.git", branch = "fix-evm", optional = true }
 
 # ethersdb
 tokio = { version = "1.32", features = [
@@ -36,8 +38,6 @@ futures = { version = "0.3.27", optional = true }
 hex-literal = "0.4"
 ethers-contract = { version = "2.0.10", default-features = false }
 hex = "0.4.3"
-anyhow = "1.0.75"
-bytes = "1.5.0"
 criterion = "0.5"
 
 [features]
@@ -45,7 +45,7 @@ default = ["std", "c-kzg", "secp256k1", "ceramic"]
 std = ["revm-interpreter/std", "revm-precompile/std"]
 serde = ["dep:serde", "dep:serde_json", "revm-interpreter/serde"]
 arbitrary = ["revm-interpreter/arbitrary"]
-ceramic = ["ceramic-http-client", "ethersdb"]
+ceramic = ["ceramic-http-client", "ethersdb", "dep:serde_json"]
 
 ethersdb = ["std", "tokio", "futures", "ethers-providers", "ethers-core"]
 

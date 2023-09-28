@@ -3,6 +3,7 @@ use crate::U256;
 use crate::{Account, Bytecode};
 use crate::{B160, B256};
 use auto_impl::auto_impl;
+use bytes::Bytes;
 use hashbrown::HashMap as Map;
 
 pub mod components;
@@ -26,6 +27,14 @@ pub trait Database {
 
     /// Get block hash by block number.
     fn block_hash(&mut self, number: U256) -> Result<B256, Self::Error>;
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error>;
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error>;
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error>;
 }
 
 impl<F: DatabaseRef> From<F> for WrapDatabaseRef<F> {
@@ -55,6 +64,14 @@ pub trait DatabaseRef {
 
     /// Get block hash by block number.
     fn block_hash(&self, number: U256) -> Result<B256, Self::Error>;
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error>;
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error>;
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error>;
 }
 
 /// Wraps a [`DatabaseRef`] to provide a [`Database`] implementation.
@@ -81,6 +98,20 @@ impl<T: DatabaseRef> Database for WrapDatabaseRef<T> {
     #[inline]
     fn block_hash(&mut self, number: U256) -> Result<B256, Self::Error> {
         self.0.block_hash(number)
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        self.0.offchain_struct(metadata, inputs)
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        self.0.offchain_read(metadata, inputs)
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        self.0.offchain_write(metadata, inputs)
     }
 }
 
@@ -121,5 +152,19 @@ impl<'a, E> Database for RefDBWrapper<'a, E> {
     #[inline]
     fn block_hash(&mut self, number: U256) -> Result<B256, Self::Error> {
         self.db.block_hash(number)
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        self.db.offchain_struct(metadata, inputs)
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        self.db.offchain_read(metadata, inputs)
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        self.db.offchain_write(metadata, inputs)
     }
 }

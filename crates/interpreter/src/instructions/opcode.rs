@@ -122,9 +122,9 @@ opcodes! {
     // 0x2A
     // 0x2B
     // 0x2C
-    // 0x2D
-    // 0x2E
-    // 0x2F
+    0x2D => OFFCHAINSTRUCT => system::offchain_struct,
+    0x2E => OFFCHAINREAD     => system::offchain_read,
+    0x2F => OFFCHAINWRITE  => system::offchain_write,
     0x30 => ADDRESS   => system::address,
     0x31 => BALANCE   => host::balance::<H, SPEC>,
     0x32 => ORIGIN    => host_env::origin,

@@ -1,3 +1,4 @@
+use revm_primitives::bytes;
 use crate::{
     gas,
     primitives::{Spec, B256, KECCAK_EMPTY, U256},
@@ -52,6 +53,63 @@ pub fn codecopy<H: Host>(interpreter: &mut Interpreter, _host: &mut H) {
         len,
         interpreter.contract.bytecode.original_bytecode_slice(),
     );
+}
+
+// #CERAMIC
+fn offchain_function<F>(interpreter: &mut Interpreter, mut func: F)
+    where F: FnMut(&[u8], &[u8]) -> Result<bytes::Bytes, InstructionResult>
+{
+    pop!(interpreter, from, len);
+    let len = as_usize_or_fail!(interpreter, len);
+    gas_or_fail!(interpreter, gas::offchain_cost(len as u64));
+
+    if len == 0 {
+        interpreter.instruction_result = InstructionResult::Stop;
+        return;
+    }
+    let from = as_usize_or_fail!(interpreter, from);
+    memory_resize!(interpreter, from, len);
+    let meta = interpreter.memory.slice(from, len).to_vec();
+
+    pop!(interpreter, from, len);
+    let len = as_usize_or_fail!(interpreter, len);
+    gas_or_fail!(interpreter, gas::offchain_cost(len as u64));
+
+    if len == 0 {
+        interpreter.instruction_result = InstructionResult::Stop;
+        return;
+    }
+    let from = as_usize_or_fail!(interpreter, from);
+    memory_resize!(interpreter, from, len);
+    let data = interpreter.memory.slice(from, len).to_vec();
+
+    match func(&meta, &data) {
+        Ok(out) => {
+            if len != 0 {
+                memory_resize!(interpreter, from, out.len());
+                interpreter.memory.set(
+                    from,
+                    &out,
+                );
+            }
+        },
+        Err(e) => {
+            interpreter.instruction_result = e;
+            return;
+        }
+    }
+}
+
+pub fn offchain_struct<H: Host>(interpreter: &mut Interpreter, host: &mut H) {
+    offchain_function(interpreter, |meta, data| host.offchain_struct(meta, data));
+}
+
+pub fn offchain_read<H: Host>(interpreter: &mut Interpreter, host: &mut H) {
+    offchain_function(interpreter, |meta, data| host.offchain_read(meta, data));
+}
+
+pub fn offchain_write<H: Host>(interpreter: &mut Interpreter, host: &mut H) {
+    offchain_function(interpreter, |meta, data| host.offchain_write(meta, data));
 }
 
 pub fn calldataload<H: Host>(interpreter: &mut Interpreter, _host: &mut H) {

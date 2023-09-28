@@ -4,6 +4,7 @@ use ethers_core::types::{BlockId, H160 as eH160, H256, U64 as eU64};
 use ethers_providers::Middleware;
 use std::sync::Arc;
 use tokio::runtime::{Handle, Runtime};
+use bytes::Bytes;
 
 pub struct EthersDB<M: Middleware> {
     client: Arc<M>,
@@ -124,6 +125,20 @@ impl<M: Middleware> Database for EthersDB<M> {
                 .flatten()
         };
         Ok(B256(self.block_on(f).unwrap().hash.unwrap().0))
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
     }
 }
 

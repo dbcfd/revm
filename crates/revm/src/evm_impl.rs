@@ -68,7 +68,9 @@ pub trait Transact<DBError> {
     #[inline]
     fn transact(&mut self) -> EVMResult<DBError> {
         self.preverify_transaction()
-            .and_then(|_| self.transact_preverified())
+            .and_then(|_| {
+                self.transact_preverified()
+            })
     }
 }
 
@@ -918,5 +920,25 @@ impl<'a, GSPEC: Spec, DB: Database + 'a, const INSPECT: bool> Host
         } else {
             (ret.result, ret.gas, ret.return_value)
         }
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, InstructionResult> {
+        self.data.db.offchain_struct(metadata, inputs).map_err(|_| {
+            InstructionResult::FatalExternalError
+        })
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, InstructionResult> {
+        self.data.db.offchain_read(metadata, inputs).map_err(|_| {
+            InstructionResult::FatalExternalError
+        })
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, InstructionResult> {
+        self.data.db.offchain_write(metadata, inputs).map_err(|_| {
+            InstructionResult::FatalExternalError
+        })
     }
 }

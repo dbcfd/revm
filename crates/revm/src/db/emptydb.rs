@@ -1,4 +1,5 @@
 use core::{convert::Infallible, fmt, marker::PhantomData};
+use bytes::Bytes;
 use revm_interpreter::primitives::{
     db::{Database, DatabaseRef},
     AccountInfo, Bytecode, B160, B256, U256,
@@ -79,6 +80,20 @@ impl<E> Database for EmptyDBTyped<E> {
     fn block_hash(&mut self, number: U256) -> Result<B256, Self::Error> {
         <Self as DatabaseRef>::block_hash(self, number)
     }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
 }
 
 impl<E> DatabaseRef for EmptyDBTyped<E> {
@@ -102,5 +117,19 @@ impl<E> DatabaseRef for EmptyDBTyped<E> {
     #[inline]
     fn block_hash(&self, number: U256) -> Result<B256, Self::Error> {
         Ok(number.to_be_bytes().into())
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
     }
 }

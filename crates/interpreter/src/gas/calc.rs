@@ -148,6 +148,13 @@ pub fn log_cost(n: u8, len: u64) -> Option<u64> {
         .checked_add(LOGTOPIC * n as u64)
 }
 
+// #CERAMIC
+pub fn offchain_cost(len: u64) -> Option<u64> {
+    let wordd = len / 32;
+    let wordr = len % 32;
+    OFFCHAIN.checked_add(OFFCHAIN_WORD.checked_mul(if wordr == 0 { wordd } else { wordd + 1 })?)
+}
+
 pub fn keccak256_cost(len: u64) -> Option<u64> {
     let wordd = len / 32;
     let wordr = len % 32;

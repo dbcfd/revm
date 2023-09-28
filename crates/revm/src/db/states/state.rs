@@ -8,6 +8,7 @@ use alloc::{
     collections::{btree_map, BTreeMap},
     vec::Vec,
 };
+use bytes::Bytes;
 use revm_interpreter::primitives::{
     db::{Database, DatabaseCommit},
     hash_map, Account, AccountInfo, Bytecode, HashMap, B160, B256, BLOCK_HASH_HISTORY, U256,
@@ -288,6 +289,20 @@ impl<DB: Database> Database for State<DB> {
                 Ok(ret)
             }
         }
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        unimplemented!()
     }
 }
 

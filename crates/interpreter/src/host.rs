@@ -54,4 +54,12 @@ pub trait Host {
     ) -> (InstructionResult, Option<B160>, Gas, Bytes);
     /// Invoke a call operation.
     fn call(&mut self, input: &mut CallInputs) -> (InstructionResult, Gas, Bytes);
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, InstructionResult>;
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, InstructionResult>;
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, InstructionResult>;
 }

@@ -145,4 +145,17 @@ impl Host for DummyHost {
     fn call(&mut self, _input: &mut CallInputs) -> (InstructionResult, Gas, Bytes) {
         panic!("Call is not supported for this host")
     }
+
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, InstructionResult> {
+        panic!("Call is not supported for this host")
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, InstructionResult> {
+        panic!("Call is not supported for this host")
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, _metadata: &[u8], _inputs: &[u8]) -> Result<Bytes, InstructionResult> {
+        panic!("Call is not supported for this host")
+    }
 }

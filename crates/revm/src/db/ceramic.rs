@@ -3,10 +3,14 @@ use crate::Database;
 use ethers_core::types::{BlockId, H160 as eH160, H256, U64 as eU64};
 use ethers_providers::Middleware;
 use std::sync::Arc;
-use ceramic_http_client::ceramic_event::Signer;
+use bytes::Bytes;
+use ceramic_http_client::ceramic_event::{Signer, StreamId};
+use ceramic_http_client::{FilterQuery, ModelAccountRelation, ModelDefinition};
+use ceramic_http_client::api::Pagination;
 use tokio::runtime::{Handle, Runtime};
 use crate::db::EthersDB;
 use ceramic_http_client::remote::CeramicRemoteHttpClient;
+use std::str::FromStr;
 
 pub struct CeramicDB<M: Middleware, S: Signer> {
     ceramic_client: CeramicRemoteHttpClient<S>,
@@ -37,7 +41,7 @@ impl<M: Middleware, S: Signer> CeramicDB<M, S> {
 }
 
 impl<M: Middleware, S: Signer> Database for CeramicDB<M, S> {
-    type Error = ();
+    type Error = anyhow::Error;
 
     fn basic(&mut self, address: B160) -> Result<Option<AccountInfo>, Self::Error> {
         let add = eH160::from(address.0);
@@ -105,6 +109,34 @@ impl<M: Middleware, S: Signer> Database for CeramicDB<M, S> {
                 .flatten()
         };
         Ok(B256(self.block_on(f).unwrap().hash.unwrap().0))
+    }
+
+    // #CERAMIC
+    /// Create a structure in offchain storage
+    fn offchain_struct(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        let model = ModelDefinition::new_for_value(
+            &String::from_utf8_lossy(metadata),
+            ModelAccountRelation::List,
+            serde_json::from_slice(inputs)?,
+        )?;
+        let stream_id = self.block_on(self.ceramic_client.create_model(&model))?;
+        Ok(Bytes::from(stream_id.to_string()))
+    }
+    /// Read from offchain storage
+    fn offchain_read(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        let stream_id = StreamId::from_str(&String::from_utf8_lossy(metadata))?;
+        let query: Option<FilterQuery> = serde_json::from_slice(inputs)?;
+        let resp = self.block_on(self.ceramic_client.query(&stream_id, query, Pagination::First { after: None, first: 100 }))?;
+        let edges: Vec<_> = resp.edges.into_iter().map(|edge| edge.node.content).collect();
+        let bytes = serde_json::to_string(&edges)?;
+        Ok(Bytes::from(bytes))
+    }
+    /// Write to offchain storage
+    fn offchain_write(&self, metadata: &[u8], inputs: &[u8]) -> Result<Bytes, Self::Error> {
+        let stream_id = StreamId::from_str(&String::from_utf8_lossy(metadata))?;
+        let data: serde_json::Value = serde_json::from_slice(inputs)?;
+        let stream_id = self.block_on(self.ceramic_client.create_list_instance(&stream_id, data))?;
+        Ok(Bytes::from(stream_id.to_string()))
     }
 }
 
